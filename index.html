@@ -786,36 +786,36 @@
                     <span>Active filter:</span>
                     <div class="active-filters" id="activeFiltersContainer"></div>
                 </div>
-                <a href="#" class="clear-filter" onclick="clearAllFilters(event)">
+                <a href="#" class="clear-filter" onclick="window.clearAllFilters(event)">
                     <i class="fas fa-times-circle"></i> Clear filter
                 </a>
             </div>
 
             <!-- Button Grid -->
             <div class="button-grid">
-                <button class="btn btn-primary" onclick="searchArchives()">
+                <button class="btn btn-primary" onclick="window.searchArchives()">
                     <i class="fas fa-search"></i> Search Selected
                 </button>
-                <button class="btn btn-secondary" onclick="searchOnInternet()">
+                <button class="btn btn-secondary" onclick="window.searchOnInternet()">
                     <i class="fas fa-globe"></i> Google Search
                 </button>
             </div>
 
             <!-- Quick Actions -->
             <div class="quick-actions">
-                <button class="quick-action-btn" onclick="quickSearch('anime', 'naruto')">
+                <button class="quick-action-btn" onclick="window.quickSearch('anime', 'naruto')">
                     <i class="fas fa-tv"></i> Anime
                 </button>
-                <button class="quick-action-btn" onclick="quickSearch('movies', 'inception')">
+                <button class="quick-action-btn" onclick="window.quickSearch('movies', 'inception')">
                     <i class="fas fa-film"></i> Movies
                 </button>
-                <button class="quick-action-btn" onclick="quickSearch('software', 'photoshop')">
+                <button class="quick-action-btn" onclick="window.quickSearch('software', 'photoshop')">
                     <i class="fas fa-code"></i> Software
                 </button>
-                <button class="quick-action-btn" onclick="quickSearch('books', 'harry potter')">
+                <button class="quick-action-btn" onclick="window.quickSearch('books', 'harry potter')">
                     <i class="fas fa-book"></i> Books
                 </button>
-                <button class="quick-action-btn" onclick="clearAllFilters()">
+                <button class="quick-action-btn" onclick="window.clearAllFilters()">
                     <i class="fas fa-eraser"></i> Reset
                 </button>
             </div>
@@ -848,7 +848,7 @@
             </div>
             <div id="archivesContainer" class="archives-grid"></div>
             <div style="text-align: center; margin-top: 20px;">
-                <button class="btn" onclick="toggleArchivesList()">
+                <button class="btn" onclick="window.toggleArchivesList()">
                     <i class="fas fa-eye-slash"></i> Hide Archives
                 </button>
             </div>
@@ -911,7 +911,7 @@
             if (!container) return;
             
             container.innerHTML = CATEGORIES.map(category => `
-                <div class="category-chip ${category.id}" onclick="selectCategory('${category.id}')">
+                <div class="category-chip ${category.id}" onclick="window.selectCategory('${category.id}')">
                     <i class="${category.icon}"></i>
                     <span>${category.name}</span>
                 </div>
@@ -977,117 +977,36 @@
             searchArchives();
         }
 
-       // ============================================
-// ARCHIVE MANAGEMENT - MULTI-CATEGORY SUPPORT
-// ============================================
+        // ============================================
+        // ARCHIVE MANAGEMENT - MULTI-CATEGORY SUPPORT
+        // ============================================
 
-function loadArchives() {
-    // First, try to load existing archives from localStorage
-    const storedArchives = localStorage.getItem('archives');
-    console.log('Loading archives from storage:', storedArchives); // Debug log
-    
-    let archives;
-    
-    if (storedArchives && storedArchives !== '[]') {
-        // Use existing data if available
-        try {
-            archives = JSON.parse(storedArchives);
-            console.log('Using existing archives:', archives.length);
-        } catch (e) {
-            console.error('Error parsing stored archives:', e);
-            archives = [];
-        }
-    } else {
-        // Only use default data if no data exists
-        console.log('No existing archives found, loading defaults');
-        archives = getDefaultArchives();
-        
-        // Save defaults to localStorage
-        localStorage.setItem('archives', JSON.stringify(archives));
-        console.log('Saved default archives to storage');
-    }
-    
-    // Migrate old format (single category) to new format (categories array)
-    let updated = false;
-    archives.forEach(archive => {
-        if (archive.category && !archive.categories) {
-            archive.categories = [archive.category];
-            delete archive.category;
-            updated = true;
-        }
-        
-        if (!archive.categories || archive.categories.length === 0) {
-            archive.categories = ['other'];
-            updated = true;
-        }
-        
-        if (!archive.searchPattern) {
-            archive.searchPattern = '/?s={query}';
-            updated = true;
-        }
-    });
-    
-    if (updated) {
-        localStorage.setItem('archives', JSON.stringify(archives));
-        console.log('Updated archive format');
-    }
-
-    return archives;
-}
-
-// Separate function for default archives
-function getDefaultArchives() {
-    return [
-        {
-            name: 'AnimeFlix',
-            url: 'animeflix.town',
-            searchPattern: '/?s={query}',
-            description: 'Watch anime online in HD quality',
-            categories: ['anime'],
-            addedDate: new Date().toISOString()
-        },
-        {
-            name: 'AnimeWorld',
-            url: 'anime-world.com',
-            searchPattern: '/search?q={query}',
-            description: 'Subbed and dubbed anime',
-            categories: ['anime'],
-            addedDate: new Date().toISOString()
-        },
-        {
-            name: 'MoviesMod',
-            url: 'moviesmod.town',
-            searchPattern: '/?s={query}',
-            description: 'Movies Mod 2025, MoviesMod Official',
-            categories: ['movies'],
-            addedDate: new Date().toISOString()
-        },
-        {
-            name: 'Multimovies',
-            url: 'multimovies.com',
-            searchPattern: '/?s={query}',
-            description: 'Streaming Movies, TV Shows, and Cartoons',
-            categories: ['movies', 'anime'],
-            addedDate: new Date().toISOString()
-        },
-        {
-            name: 'SoftArchive',
-            url: 'softarchive.town',
-            searchPattern: '/?s={query}',
-            description: 'Software, games, and ebooks',
-            categories: ['software', 'games', 'books'],
-            addedDate: new Date().toISOString()
-        },
-        {
-            name: 'MediaHub',
-            url: 'mediahub.net',
-            searchPattern: '/search?q={query}',
-            description: 'All in one - Movies, Music, Software',
-            categories: ['movies', 'music', 'software'],
-            addedDate: new Date().toISOString()
-        }
-    ];
-}
+        function loadArchives() {
+            // First, try to load existing archives from localStorage
+            const storedArchives = localStorage.getItem('archives');
+            console.log('Loading archives from storage:', storedArchives); // Debug log
+            
+            let archives;
+            
+            if (storedArchives && storedArchives !== '[]') {
+                // Use existing data if available
+                try {
+                    archives = JSON.parse(storedArchives);
+                    console.log('Using existing archives:', archives.length);
+                } catch (e) {
+                    console.error('Error parsing stored archives:', e);
+                    archives = [];
+                }
+            } else {
+                // Only use default data if no data exists
+                console.log('No existing archives found, loading defaults');
+                archives = getDefaultArchives();
+                
+                // Save defaults to localStorage
+                localStorage.setItem('archives', JSON.stringify(archives));
+                console.log('Saved default archives to storage');
+            }
+            
             // Migrate old format (single category) to new format (categories array)
             let updated = false;
             archives.forEach(archive => {
@@ -1097,7 +1016,7 @@ function getDefaultArchives() {
                     updated = true;
                 }
                 
-                if (!archive.categories) {
+                if (!archive.categories || archive.categories.length === 0) {
                     archive.categories = ['other'];
                     updated = true;
                 }
@@ -1110,9 +1029,64 @@ function getDefaultArchives() {
             
             if (updated) {
                 localStorage.setItem('archives', JSON.stringify(archives));
+                console.log('Updated archive format');
             }
 
             return archives;
+        }
+
+        // Separate function for default archives
+        function getDefaultArchives() {
+            return [
+                {
+                    name: 'AnimeFlix',
+                    url: 'animeflix.town',
+                    searchPattern: '/?s={query}',
+                    description: 'Watch anime online in HD quality',
+                    categories: ['anime'],
+                    addedDate: new Date().toISOString()
+                },
+                {
+                    name: 'AnimeWorld',
+                    url: 'anime-world.com',
+                    searchPattern: '/search?q={query}',
+                    description: 'Subbed and dubbed anime',
+                    categories: ['anime'],
+                    addedDate: new Date().toISOString()
+                },
+                {
+                    name: 'MoviesMod',
+                    url: 'moviesmod.town',
+                    searchPattern: '/?s={query}',
+                    description: 'Movies Mod 2025, MoviesMod Official',
+                    categories: ['movies'],
+                    addedDate: new Date().toISOString()
+                },
+                {
+                    name: 'Multimovies',
+                    url: 'multimovies.com',
+                    searchPattern: '/?s={query}',
+                    description: 'Streaming Movies, TV Shows, and Cartoons',
+                    categories: ['movies', 'anime'],
+                    addedDate: new Date().toISOString()
+                },
+                {
+                    name: 'SoftArchive',
+                    url: 'softarchive.town',
+                    searchPattern: '/?s={query}',
+                    description: 'Software, games, and ebooks',
+                    categories: ['software', 'games', 'books'],
+                    addedDate: new Date().toISOString()
+                },
+                {
+                    name: 'MediaHub',
+                    url: 'mediahub.net',
+                    searchPattern: '/search?q={query}',
+                    description: 'All in one - Movies, Music, Software',
+                    categories: ['movies', 'music', 'software'],
+                    addedDate: new Date().toISOString()
+                }
+            ];
         }
 
         // Get filtered archives by category
@@ -1267,7 +1241,7 @@ function getDefaultArchives() {
                     <p style="color: var(--text-muted); margin-bottom: 24px;">Try a different category or add archives in the admin panel</p>
                     <div class="suggestion-chips">
                         ${suggestions.slice(0, 6).map(s => `
-                            <a href="#" class="suggestion-chip" onclick="quickSearch('${currentCategory}', '${s}'); return false;">
+                            <a href="#" class="suggestion-chip" onclick="window.quickSearch('${currentCategory}', '${s}'); return false;">
                                 ${s}
                             </a>
                         `).join('')}
@@ -1352,6 +1326,31 @@ function getDefaultArchives() {
             }
         }
 
+        // Listen for storage changes (when data is modified in another tab)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'archives') {
+                console.log('Archives updated in another tab, refreshing...');
+                displayArchives();
+                showToast('Data synced from another tab', 'info');
+            }
+        });
+
+        // Debug function to check storage
+        function checkStorage() {
+            const stored = localStorage.getItem('archives');
+            console.log('Raw storage:', stored);
+            
+            try {
+                const parsed = JSON.parse(stored || '[]');
+                console.log('Parsed archives:', parsed);
+                showToast(`Found ${parsed.length} archives in storage`, 'info');
+                return parsed;
+            } catch (e) {
+                console.error('Error:', e);
+                showToast('Error reading storage', 'error');
+            }
+        }
+
         // Initialize everything
         document.addEventListener('DOMContentLoaded', function() {
             initializeCategories();
@@ -1360,6 +1359,9 @@ function getDefaultArchives() {
             
             // Hide archives section by default
             document.getElementById('archivesList').classList.remove('visible');
+            
+            // Check storage after load
+            setTimeout(checkStorage, 1000);
         });
 
         // Enter key handler
@@ -1372,42 +1374,15 @@ function getDefaultArchives() {
             });
         }
 
-        // Security: Clear sensitive data on page hide
-       // Add to both admin.html and index.html (inside script section)
-// Listen for storage changes (when data is modified in another tab)
-window.addEventListener('storage', function(e) {
-    if (e.key === 'archives') {
-        console.log('Archives updated in another tab, refreshing...');
-        if (typeof displayArchives === 'function') {
-            displayArchives();
-        }
-        if (typeof displayCategoryStats === 'function') {
-            displayCategoryStats();
-        }
-        if (typeof displayArchivesList === 'function') {
-            displayArchivesList();
-        }
-        showToast('Data synced from another tab', 'info');
-    }
-});
-// Debug function to check storage
-window.checkStorage = function() {
-    const stored = localStorage.getItem('archives');
-    console.log('Raw storage:', stored);
-    
-    try {
-        const parsed = JSON.parse(stored || '[]');
-        console.log('Parsed archives:', parsed);
-        alert(`Found ${parsed.length} archives in storage`);
-        return parsed;
-    } catch (e) {
-        console.error('Error:', e);
-        alert('Error reading storage');
-    }
-};
-
-// Call it on load
-setTimeout(checkStorage, 1000);
+        // Make functions globally available
+        window.showToast = showToast;
+        window.selectCategory = selectCategory;
+        window.clearAllFilters = clearAllFilters;
+        window.quickSearch = quickSearch;
+        window.searchArchives = searchArchives;
+        window.searchOnInternet = searchOnInternet;
+        window.toggleArchivesList = toggleArchivesList;
+        window.checkStorage = checkStorage;
     </script>
 </body>
 </html>
