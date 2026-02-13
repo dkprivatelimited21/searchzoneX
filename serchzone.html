@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>SearchZone - Universal Archive Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* ===== DARK THEME VARIABLES ===== */
+        :root {
+            --bg-primary: #0a0c10;
+            --bg-secondary: #14181c;
+            --bg-card: #1e2428;
+            --bg-hover: #2a3138;
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --text-muted: #8a8f99;
+            --accent-primary: #6c5ce7;
+            --accent-secondary: #a463f5;
+            --accent-success: #00b894;
+            --accent-warning: #fdcb6e;
+            --accent-danger: #d63031;
+            --border-color: #2d343e;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            
+            /* Category Colors */
+            --category-anime: #ff6b6b;
+            --category-movies: #4ecdc4;
+            --category-software: #a8e6cf;
+            --category-books: #ffd93d;
+            --category-games: #6c5ce7;
+            --category-music: #ff9ff3;
+            --category-other: #8395a7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-link {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #6c5ce7, #a463f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* ===== SEARCH CARD ===== */
+        .search-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 40px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            font-size: 1.1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ===== CATEGORY FILTERS ===== */
+        .category-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .category-chip {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .category-chip:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .category-chip.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .category-chip.active i {
+            color: white;
+        }
+
+        /* Category-specific active colors */
+        .category-chip.anime.active { background: var(--category-anime); border-color: var(--category-anime); }
+        .category-chip.movies.active { background: var(--category-movies); border-color: var(--category-movies); color: var(--bg-primary); }
+        .category-chip.software.active { background: var(--category-software); border-color: var(--category-software); color: var(--bg-primary); }
+        .category-chip.books.active { background: var(--category-books); border-color: var(--category-books); color: var(--bg-primary); }
+        .category-chip.games.active { background: var(--category-games); border-color: var(--category-games); }
+        .category-chip.music.active { background: var(--category-music); border-color: var(--category-music); color: var(--bg-primary); }
+
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tag {
+            background: rgba(108, 92, 231, 0.2);
+            border: 1px solid var(--accent-primary);
+            color: var(--text-primary);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clear-filter {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .clear-filter:hover {
+            color: var(--accent-danger);
+            background: rgba(214, 48, 49, 0.1);
+        }
+
+        /* ===== BUTTONS ===== */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6c5ce7, #a463f5);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 184, 148, 0.3);
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .quick-action-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        /* ===== RESULTS SECTION ===== */
+        .results-section {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .results-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .stat-badge {
+            background: var(--bg-secondary);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* ===== SEARCH LINKS ===== */
+        .search-link {
+            display: block;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            border-left-width: 4px;
+            border-left-color: var(--accent-primary);
+            transition: all 0.3s ease;
+            position: relative;
+            animation: slideIn 0.4s ease forwards;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .search-link:hover {
+            background: var(--bg-hover);
+            transform: translateX(5px);
+            border-left-color: var(--accent-secondary);
+        }
+
+        .search-link-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-link-url {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            word-break: break-all;
+        }
+
+        /* Multi-category badges container */
+        .search-link-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .category-badge-small {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .category-badge-small.anime { background: var(--category-anime); color: white; }
+        .category-badge-small.movies { background: var(--category-movies); color: var(--bg-primary); }
+        .category-badge-small.software { background: var(--category-software); color: var(--bg-primary); }
+        .category-badge-small.books { background: var(--category-books); color: var(--bg-primary); }
+        .category-badge-small.games { background: var(--category-games); color: white; }
+        .category-badge-small.music { background: var(--category-music); color: var(--bg-primary); }
+        .category-badge-small.other { background: var(--category-other); color: white; }
+
+        /* ===== NO RESULTS ===== */
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            border-radius: 16px;
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .suggestion-chip {
+            background: var(--bg-card);
+            padding: 8px 16px;
+            border-radius: 30px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .suggestion-chip:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        /* ===== ARCHIVES LIST (HIDDEN BY DEFAULT) ===== */
+        .archives-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .archives-section.visible {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        .section-header span {
+            background: var(--accent-primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .archives-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .archive-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            border-left-width: 4px;
+            border-left-color: var(--accent-primary);
+            position: relative;
+        }
+
+        .archive-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .archive-url {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            word-break: break-all;
+        }
+
+        /* Multi-category badges container */
+        .category-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .category-badge.anime { background: var(--category-anime); color: white; }
+        .category-badge.movies { background: var(--category-movies); color: var(--bg-primary); }
+        .category-badge.software { background: var(--category-software); color: var(--bg-primary); }
+        .category-badge.books { background: var(--category-books); color: var(--bg-primary); }
+        .category-badge.games { background: var(--category-games); color: white; }
+        .category-badge.music { background: var(--category-music); color: var(--bg-primary); }
+        .category-badge.other { background: var(--category-other); color: white; }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-top: 10px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--accent-success);
+            animation: slideInRight 0.3s ease;
+            max-width: 350px;
+            border: 1px solid var(--border-color);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.error { border-left-color: var(--accent-danger); }
+        .toast.warning { border-left-color: var(--accent-warning); }
+        .toast.info { border-left-color: var(--accent-primary); }
+
+        /* ===== LOADING ===== */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--accent-primary);
+        }
+
+        .loading i {
+            margin-right: 10px;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .nav-bar {
+                flex-direction: column;
+            }
+
+            .nav-link {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .search-card {
+                padding: 20px;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toast-container {
+                left: 20px;
+                right: 20px;
+            }
+
+            .toast {
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .category-chip {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            .quick-actions {
+                justify-content: center;
+            }
+
+            .results-summary {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    
+
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔍 SearchZoneX</h1>
+            <p>Search across multiple archives with multi-category filtering</p>
+        </div>
+
+        <!-- Main Search Card -->
+        <div class="search-card">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Enter your search term..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <!-- Category Filter Section -->
+            <div class="category-section">
+                <div class="category-title">
+                    <i class="fas fa-filter"></i>
+                    <span>Filter by Category</span>
+                </div>
+                <div class="category-grid" id="categoryFilters"></div>
+            </div>
+
+            <!-- Active Filter Bar -->
+            <div class="filter-bar" id="filterBar" style="display: none;">
+                <div class="filter-info">
+                    <i class="fas fa-search"></i>
+                    <span>Active filter:</span>
+                    <div class="active-filters" id="activeFiltersContainer"></div>
+                </div>
+                <a href="#" class="clear-filter" onclick="clearAllFilters(event)">
+                    <i class="fas fa-times-circle"></i> Clear filter
+                </a>
+            </div>
+
+            <!-- Button Grid -->
+            <div class="button-grid">
+                <button class="btn btn-primary" onclick="searchArchives()">
+                    <i class="fas fa-search"></i> Search Selected
+                </button>
+                <button class="btn btn-secondary" onclick="searchOnInternet()">
+                    <i class="fas fa-globe"></i> Google Search
+                </button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="quickSearch('anime', 'naruto')">
+                    <i class="fas fa-tv"></i> Anime
+                </button>
+                <button class="quick-action-btn" onclick="quickSearch('movies', 'inception')">
+                    <i class="fas fa-film"></i> Movies
+                </button>
+                <button class="quick-action-btn" onclick="quickSearch('software', 'photoshop')">
+                    <i class="fas fa-code"></i> Software
+                </button>
+                <button class="quick-action-btn" onclick="quickSearch('books', 'harry potter')">
+                    <i class="fas fa-book"></i> Books
+                </button>
+                <button class="quick-action-btn" onclick="clearAllFilters()">
+                    <i class="fas fa-eraser"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <h2><i class="fas fa-search"></i> Search Results</h2>
+                <div class="results-summary">
+                    <div class="category-stats">
+                        <span class="stat-badge" id="totalResultsCount">
+                            <i class="fas fa-database"></i> <span id="resultCount">0</span> results
+                        </span>
+                        <span class="stat-badge" id="activeCategoryBadge" style="display: none;">
+                            <i class="fas fa-tag"></i> <span id="activeCategoryName"></span>
+                        </span>
+                    </div>
+                    <p class="results-count" id="resultsCount"></p>
+                </div>
+            </div>
+            <div id="searchLinks"></div>
+        </div>
+
+        <!-- Hidden Archives List (for admin reference) -->
+        <div class="archives-section" id="archivesList">
+            <div class="section-header">
+                <h3><i class="fas fa-archive"></i> Available Archives</h3>
+                <span id="archiveCount">0</span>
+            </div>
+            <div id="archivesContainer" class="archives-grid"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="toggleArchivesList()">
+                    <i class="fas fa-eye-slash"></i> Hide Archives
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        // ============================================
+        // TOAST NOTIFICATION SYSTEM
+        // ============================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            
+            toast.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <div style="flex: 1;">${message}</div>
+                <i class="fas fa-times" style="cursor: pointer; opacity: 0.7;" onclick="this.parentElement.remove()"></i>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 4000);
+        }
+
+        // ============================================
+        // CATEGORY MANAGEMENT
+        // ============================================
+        
+        const CATEGORIES = [
+            { id: 'all', name: 'All Archives', icon: 'fas fa-globe', color: 'var(--accent-primary)' },
+            { id: 'anime', name: 'Anime', icon: 'fas fa-tv', color: '#ff6b6b' },
+            { id: 'movies', name: 'Movies & TV', icon: 'fas fa-film', color: '#4ecdc4' },
+            { id: 'software', name: 'Software', icon: 'fas fa-code', color: '#a8e6cf' },
+            { id: 'books', name: 'Books & Comics', icon: 'fas fa-book', color: '#ffd93d' },
+            { id: 'games', name: 'Games', icon: 'fas fa-gamepad', color: '#6c5ce7' },
+            { id: 'music', name: 'Music', icon: 'fas fa-music', color: '#ff9ff3' },
+            { id: 'other', name: 'Other', icon: 'fas fa-archive', color: '#8395a7' }
+        ];
+
+        let currentCategory = 'all';
+        let currentSearchTerm = '';
+
+        // Initialize category filters
+        function initializeCategories() {
+            const container = document.getElementById('categoryFilters');
+            if (!container) return;
+            
+            container.innerHTML = CATEGORIES.map(category => `
+                <div class="category-chip ${category.id}" onclick="selectCategory('${category.id}')">
+                    <i class="${category.icon}"></i>
+                    <span>${category.name}</span>
+                </div>
+            `).join('');
+            
+            selectCategory('all', false);
+        }
+
+        // Select category filter
+        function selectCategory(categoryId, showToastMessage = true) {
+            document.querySelectorAll('.category-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            
+            const selectedChip = document.querySelector(`.category-chip.${categoryId}`);
+            if (selectedChip) {
+                selectedChip.classList.add('active');
+            }
+            
+            currentCategory = categoryId;
+            updateFilterBar();
+            
+            if (currentSearchTerm && document.getElementById('resultsSection').classList.contains('active')) {
+                searchArchives();
+            }
+            
+            if (showToastMessage) {
+                const category = CATEGORIES.find(c => c.id === categoryId);
+                showToast(`Filtered to ${category.name}`, 'info');
+            }
+        }
+
+        // Update filter bar
+        function updateFilterBar() {
+            const filterBar = document.getElementById('filterBar');
+            const activeFiltersContainer = document.getElementById('activeFiltersContainer');
+            
+            if (currentCategory !== 'all' && filterBar && activeFiltersContainer) {
+                filterBar.style.display = 'flex';
+                const category = CATEGORIES.find(c => c.id === currentCategory);
+                activeFiltersContainer.innerHTML = `
+                    <div class="filter-tag">
+                        <i class="${category.icon}"></i>
+                        <span>${category.name}</span>
+                    </div>
+                `;
+            } else if (filterBar) {
+                filterBar.style.display = 'none';
+            }
+        }
+
+        // Clear all filters
+        function clearAllFilters(e) {
+            if (e) e.preventDefault();
+            selectCategory('all');
+            showToast('All filters cleared', 'info');
+        }
+
+        // Quick search with category
+        function quickSearch(category, term) {
+            selectCategory(category);
+            document.getElementById('searchInput').value = term;
+            searchArchives();
+        }
+
+        // ============================================
+        // ARCHIVE MANAGEMENT - MULTI-CATEGORY SUPPORT
+        // ============================================
+        
+        function loadArchives() {
+            const archives = JSON.parse(localStorage.getItem('archives') || '[]');
+            
+            if (archives.length === 0) {
+                // Default archives with multiple categories
+                archives.push(
+                    {
+                        name: 'AnimeFlix',
+                        url: 'animeflix.town',
+                        searchPattern: '/?s={query}',
+                        description: 'Watch anime online in HD quality',
+                        categories: ['anime'], // Single category
+                        addedDate: new Date().toISOString()
+                    },
+                    {
+                        name: 'AnimeWorld',
+                        url: 'anime-world.com',
+                        searchPattern: '/search?q={query}',
+                        description: 'Subbed and dubbed anime',
+                        categories: ['anime'],
+                        addedDate: new Date().toISOString()
+                    },
+                    {
+                        name: 'MoviesMod',
+                        url: 'moviesmod.town',
+                        searchPattern: '/?s={query}',
+                        description: 'Movies Mod 2025, MoviesMod Official',
+                        categories: ['movies'],
+                        addedDate: new Date().toISOString()
+                    },
+                    {
+                        name: 'Multimovies',
+                        url: 'multimovies.com',
+                        searchPattern: '/?s={query}',
+                        description: 'Streaming Movies, TV Shows, and Cartoons',
+                        categories: ['movies', 'anime'], // Multiple categories - both movies AND anime
+                        addedDate: new Date().toISOString()
+                    },
+                    {
+                        name: 'SoftArchive',
+                        url: 'softarchive.town',
+                        searchPattern: '/?s={query}',
+                        description: 'Software, games, and ebooks',
+                        categories: ['software', 'games', 'books'], // Multiple categories
+                        addedDate: new Date().toISOString()
+                    },
+                    {
+                        name: 'MediaHub',
+                        url: 'mediahub.net',
+                        searchPattern: '/search?q={query}',
+                        description: 'All in one - Movies, Music, Software',
+                        categories: ['movies', 'music', 'software'], // Multiple categories
+                        addedDate: new Date().toISOString()
+                    }
+                );
+                localStorage.setItem('archives', JSON.stringify(archives));
+            }
+            
+            // Migrate old format (single category) to new format (categories array)
+            let updated = false;
+            archives.forEach(archive => {
+                // Convert old category field to categories array
+                if (archive.category && !archive.categories) {
+                    archive.categories = [archive.category];
+                    delete archive.category;
+                    updated = true;
+                }
+                
+                // Ensure categories is always an array
+                if (!archive.categories) {
+                    archive.categories = ['other'];
+                    updated = true;
+                }
+                
+                // Ensure searchPattern exists
+                if (!archive.searchPattern) {
+                    archive.searchPattern = '/?s={query}';
+                    updated = true;
+                }
+            });
+            
+            if (updated) {
+                localStorage.setItem('archives', JSON.stringify(archives));
+            }
+
+            return archives;
+        }
+
+        // Get filtered archives by category - checks if archive has the selected category
+        function getFilteredArchives() {
+            const archives = loadArchives();
+            
+            if (currentCategory === 'all') {
+                return archives;
+            }
+            
+            // Return archives that have the selected category in their categories array
+            return archives.filter(archive => 
+                archive.categories && archive.categories.includes(currentCategory)
+            );
+        }
+
+        // Display archives with multiple category badges
+        function displayArchives() {
+            const archives = loadArchives();
+            const container = document.getElementById('archivesContainer');
+            const countSpan = document.getElementById('archiveCount');
+            
+            if (!container || !countSpan) return;
+            
+            countSpan.textContent = archives.length;
+
+            if (archives.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📂</div>
+                        <p>No archives configured. Go to Admin Panel to add some!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = archives.map(archive => {
+                // Generate category badges for all categories
+                const categoryBadges = (archive.categories || ['other']).map(catId => {
+                    const category = CATEGORIES.find(c => c.id === catId) || CATEGORIES[7];
+                    return `
+                        <span class="category-badge ${catId}">
+                            <i class="${category.icon}"></i> ${category.name}
+                        </span>
+                    `;
+                }).join('');
+                
+                return `
+                    <div class="archive-card">
+                        <div class="archive-name">
+                            <i class="fas fa-globe"></i> ${archive.name}
+                        </div>
+                        <div class="archive-url">${archive.url}</div>
+                        <div class="category-badges">
+                            ${categoryBadges}
+                        </div>
+                        ${archive.description ? `<div class="archive-url" style="margin-top: 8px; color: var(--text-secondary);">📝 ${archive.description}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // SEARCH FUNCTIONS - MULTI-CATEGORY SUPPORT
+        // ============================================
+        
+        function searchArchives() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            currentSearchTerm = searchTerm;
+            
+            if (!searchTerm) {
+                showToast('Please enter a search term!', 'warning');
+                return;
+            }
+
+            const filteredArchives = getFilteredArchives();
+            
+            if (filteredArchives.length === 0) {
+                const category = CATEGORIES.find(c => c.id === currentCategory);
+                showNoResults(searchTerm, category.name);
+                return;
+            }
+
+            const linksContainer = document.getElementById('searchLinks');
+            linksContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Generating search links...</div>';
+
+            setTimeout(() => {
+                linksContainer.innerHTML = '';
+                
+                filteredArchives.forEach((archive, index) => {
+                    const searchPattern = archive.searchPattern || '/?s={query}';
+                    const encodedTerm = encodeURIComponent(searchTerm);
+                    const searchPath = searchPattern.replace('{query}', encodedTerm);
+                    const searchUrl = `https://${archive.url}${searchPath}`;
+                    
+                    // Generate category badges for all categories this archive belongs to
+                    const categoryBadges = (archive.categories || ['other']).map(catId => {
+                        const category = CATEGORIES.find(c => c.id === catId) || CATEGORIES[7];
+                        return `
+                            <span class="category-badge-small ${catId}">
+                                <i class="${category.icon}"></i> ${category.name}
+                            </span>
+                        `;
+                    }).join('');
+
+                    const linkDiv = document.createElement('a');
+                    linkDiv.href = searchUrl;
+                    linkDiv.target = '_blank';
+                    linkDiv.className = 'search-link';
+                    linkDiv.style.animationDelay = `${index * 0.05}s`;
+                    linkDiv.innerHTML = `
+                        <div class="search-link-title">
+                            <i class="fas fa-search"></i> ${archive.name}
+                        </div>
+                        <div class="search-link-url">${searchUrl}</div>
+                        <div class="search-link-categories">
+                            ${categoryBadges}
+                        </div>
+                        ${archive.description ? `<div class="search-link-url" style="margin-top: 8px;">📝 ${archive.description}</div>` : ''}
+                    `;
+                    linksContainer.appendChild(linkDiv);
+                });
+
+                const category = CATEGORIES.find(c => c.id === currentCategory);
+                const resultsCount = filteredArchives.length;
+                
+                document.getElementById('resultCount').textContent = resultsCount;
+                document.getElementById('resultsCount').innerHTML = `
+                    <i class="fas fa-check-circle" style="color: var(--accent-success);"></i> 
+                    Found ${resultsCount} ${resultsCount === 1 ? 'archive' : 'archives'} in ${category.name}
+                `;
+                
+                if (currentCategory !== 'all') {
+                    document.getElementById('activeCategoryBadge').style.display = 'flex';
+                    document.getElementById('activeCategoryName').innerHTML = `<i class="${category.icon}"></i> ${category.name}`;
+                } else {
+                    document.getElementById('activeCategoryBadge').style.display = 'none';
+                }
+                
+                document.getElementById('resultsSection').classList.add('active');
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+            }, 300);
+        }
+
+        function showNoResults(searchTerm, categoryName) {
+            const linksContainer = document.getElementById('searchLinks');
+            const suggestions = ['naruto', 'one piece', 'demon slayer', 'inception', 'avengers', 'photoshop', 'office', 'harry potter'];
+            
+            linksContainer.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-frown"></i>
+                    <h3 style="margin-bottom: 12px;">No Archives Found</h3>
+                    <p style="margin-bottom: 8px;">No ${categoryName.toLowerCase()} archives configured for "${searchTerm}"</p>
+                    <p style="color: var(--text-muted); margin-bottom: 24px;">Try a different category or add archives in the admin panel</p>
+                    <div class="suggestion-chips">
+                        ${suggestions.slice(0, 6).map(s => `
+                            <a href="#" class="suggestion-chip" onclick="quickSearch('${currentCategory}', '${s}'); return false;">
+                                ${s}
+                            </a>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 32px;">
+                        <a href="searchzone-admin.html" class="btn btn-primary" style="display: inline-flex; text-decoration: none;">
+                            <i class="fas fa-plus-circle"></i> Add Archives
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultCount').textContent = '0';
+            document.getElementById('resultsCount').innerHTML = `
+                <i class="fas fa-exclamation-circle" style="color: var(--accent-warning);"></i> 
+                No archives found in ${categoryName}
+            `;
+            
+            document.getElementById('resultsSection').classList.add('active');
+        }
+
+        function searchOnInternet() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            
+            if (!searchTerm) {
+                showToast('Please enter a search term!', 'warning');
+                return;
+            }
+
+            const filteredArchives = getFilteredArchives();
+            
+            if (filteredArchives.length === 0) {
+                const category = CATEGORIES.find(c => c.id === currentCategory);
+                showToast(`No ${category.name} archives to search`, 'error');
+                return;
+            }
+
+            const siteQueries = filteredArchives.map(archive => `site:${archive.url}`).join(' OR ');
+            const fullQuery = `(${siteQueries}) ${searchTerm}`;
+            const encodedQuery = encodeURIComponent(fullQuery);
+            const searchUrl = `https://www.google.com/search?q=${encodedQuery}`;
+
+            window.open(searchUrl, '_blank');
+
+            const linksContainer = document.getElementById('searchLinks');
+            const category = CATEGORIES.find(c => c.id === currentCategory);
+            
+            linksContainer.innerHTML = `
+                <div class="search-link" style="border-left-color: var(--accent-success);">
+                    <div class="search-link-title">
+                        <i class="fas fa-globe"></i> Google Search (${category.name})
+                    </div>
+                    <div class="search-link-url">Searching "${searchTerm}" across ${filteredArchives.length} ${category.name} archives</div>
+                    <div class="search-link-url" style="margin-top: 12px; color: var(--accent-success);">
+                        <i class="fas fa-check-circle"></i> Search opened in new tab
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultsCount').innerHTML = `
+                <i class="fas fa-globe" style="color: var(--accent-success);"></i> 
+                Google search opened for "${searchTerm}" (${category.name})
+            `;
+            
+            document.getElementById('resultsSection').classList.add('active');
+        }
+
+        // Toggle archives list visibility
+        function toggleArchivesList() {
+            const list = document.getElementById('archivesList');
+            list.classList.toggle('visible');
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCategories();
+            displayArchives();
+            
+            // Hide archives section by default
+            document.getElementById('archivesList').classList.remove('visible');
+        });
+
+        // Enter key handler
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchArchives();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
