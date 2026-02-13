@@ -83,6 +83,16 @@
             transform: translateY(-2px);
         }
 
+        .nav-link.admin-link {
+            background: linear-gradient(135deg, #6c5ce7, #a463f5);
+            border: none;
+            color: white;
+        }
+
+        .nav-link.admin-link:hover {
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+        }
+
         /* ===== HEADER ===== */
         .header {
             text-align: center;
@@ -702,17 +712,48 @@
                 align-items: flex-start;
             }
         }
+
+        /* Security Notice */
+        .security-notice {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: var(--bg-card);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            opacity: 0.7;
+            z-index: 100;
+        }
+
+        .security-notice i {
+            color: var(--accent-success);
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    
+    <!-- Security Notice -->
+    <div class="security-notice">
+        <i class="fas fa-shield-alt"></i> Protected Admin Area
+    </div>
 
+    <!-- Navigation -->
+    <div class="nav-bar">
+        <a href="index.html" class="nav-link">
+            <i class="fas fa-search"></i> Search
+        </a>
+        <a href="admin.html" class="nav-link admin-link" id="adminNavLink">
+            <i class="fas fa-cog"></i> Admin Panel
+        </a>
+    </div>
 
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🔍 SearchZoneX</h1>
+            <h1>🔍 SearchZone</h1>
             <p>Search across multiple archives with multi-category filtering</p>
         </div>
 
@@ -951,7 +992,7 @@
                         url: 'animeflix.town',
                         searchPattern: '/?s={query}',
                         description: 'Watch anime online in HD quality',
-                        categories: ['anime'], // Single category
+                        categories: ['anime'],
                         addedDate: new Date().toISOString()
                     },
                     {
@@ -975,7 +1016,7 @@
                         url: 'multimovies.com',
                         searchPattern: '/?s={query}',
                         description: 'Streaming Movies, TV Shows, and Cartoons',
-                        categories: ['movies', 'anime'], // Multiple categories - both movies AND anime
+                        categories: ['movies', 'anime'],
                         addedDate: new Date().toISOString()
                     },
                     {
@@ -983,7 +1024,7 @@
                         url: 'softarchive.town',
                         searchPattern: '/?s={query}',
                         description: 'Software, games, and ebooks',
-                        categories: ['software', 'games', 'books'], // Multiple categories
+                        categories: ['software', 'games', 'books'],
                         addedDate: new Date().toISOString()
                     },
                     {
@@ -991,7 +1032,7 @@
                         url: 'mediahub.net',
                         searchPattern: '/search?q={query}',
                         description: 'All in one - Movies, Music, Software',
-                        categories: ['movies', 'music', 'software'], // Multiple categories
+                        categories: ['movies', 'music', 'software'],
                         addedDate: new Date().toISOString()
                     }
                 );
@@ -1001,20 +1042,17 @@
             // Migrate old format (single category) to new format (categories array)
             let updated = false;
             archives.forEach(archive => {
-                // Convert old category field to categories array
                 if (archive.category && !archive.categories) {
                     archive.categories = [archive.category];
                     delete archive.category;
                     updated = true;
                 }
                 
-                // Ensure categories is always an array
                 if (!archive.categories) {
                     archive.categories = ['other'];
                     updated = true;
                 }
                 
-                // Ensure searchPattern exists
                 if (!archive.searchPattern) {
                     archive.searchPattern = '/?s={query}';
                     updated = true;
@@ -1028,7 +1066,7 @@
             return archives;
         }
 
-        // Get filtered archives by category - checks if archive has the selected category
+        // Get filtered archives by category
         function getFilteredArchives() {
             const archives = loadArchives();
             
@@ -1036,7 +1074,6 @@
                 return archives;
             }
             
-            // Return archives that have the selected category in their categories array
             return archives.filter(archive => 
                 archive.categories && archive.categories.includes(currentCategory)
             );
@@ -1063,7 +1100,6 @@
             }
 
             container.innerHTML = archives.map(archive => {
-                // Generate category badges for all categories
                 const categoryBadges = (archive.categories || ['other']).map(catId => {
                     const category = CATEGORIES.find(c => c.id === catId) || CATEGORIES[7];
                     return `
@@ -1121,7 +1157,6 @@
                     const searchPath = searchPattern.replace('{query}', encodedTerm);
                     const searchUrl = `https://${archive.url}${searchPath}`;
                     
-                    // Generate category badges for all categories this archive belongs to
                     const categoryBadges = (archive.categories || ['other']).map(catId => {
                         const category = CATEGORIES.find(c => c.id === catId) || CATEGORIES[7];
                         return `
@@ -1189,7 +1224,7 @@
                         `).join('')}
                     </div>
                     <div style="margin-top: 32px;">
-                        <a href="searchzone-admin.html" class="btn btn-primary" style="display: inline-flex; text-decoration: none;">
+                        <a href="admin.html" class="btn btn-primary" style="display: inline-flex; text-decoration: none;">
                             <i class="fas fa-plus-circle"></i> Add Archives
                         </a>
                     </div>
@@ -1257,10 +1292,22 @@
             list.classList.toggle('visible');
         }
 
+        // Check if user is authenticated for admin link
+        function checkAdminAccess() {
+            const adminLink = document.getElementById('adminNavLink');
+            const isLoggedIn = localStorage.getItem('adminSession') ? true : false;
+            
+            // Optional: Add visual indicator if logged in
+            if (isLoggedIn) {
+                adminLink.innerHTML = '<i class="fas fa-cog"></i> Admin Panel <span style="background: var(--accent-success); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; margin-left: 5px;">Active</span>';
+            }
+        }
+
         // Initialize everything
         document.addEventListener('DOMContentLoaded', function() {
             initializeCategories();
             displayArchives();
+            checkAdminAccess();
             
             // Hide archives section by default
             document.getElementById('archivesList').classList.remove('visible');
@@ -1275,6 +1322,11 @@
                 }
             });
         }
+
+        // Security: Clear sensitive data on page hide
+        window.addEventListener('pagehide', function() {
+            // Optional: Clear any sensitive data if needed
+        });
     </script>
 </body>
 </html>
