@@ -2245,6 +2245,44 @@
         window.logout = logout;
         window.extendSession = extendSession;
         window.forceLogout = forceLogout;
+
+
+// Add to both admin.html and index.html (inside script section)
+// Listen for storage changes (when data is modified in another tab)
+window.addEventListener('storage', function(e) {
+    if (e.key === 'archives') {
+        console.log('Archives updated in another tab, refreshing...');
+        if (typeof displayArchives === 'function') {
+            displayArchives();
+        }
+        if (typeof displayCategoryStats === 'function') {
+            displayCategoryStats();
+        }
+        if (typeof displayArchivesList === 'function') {
+            displayArchivesList();
+        }
+        showToast('Data synced from another tab', 'info');
+    }
+});
+
+
+// Add this at the very end of the script section in admin.html
+// Verify data is saved correctly
+window.verifyStorage = function() {
+    const archives = localStorage.getItem('archives');
+    console.log('Current archives in storage:', archives);
+    showToast(`Storage verified: ${JSON.parse(archives || '[]').length} archives found`, 'info');
+    return archives;
+};
+
+// Call it on load
+setTimeout(() => {
+    if (isAuthenticated()) {
+        verifyStorage();
+    }
+}, 500);
+
     </script>
+
 </body>
 </html>

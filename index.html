@@ -977,68 +977,117 @@
             searchArchives();
         }
 
-        // ============================================
-        // ARCHIVE MANAGEMENT - MULTI-CATEGORY SUPPORT
-        // ============================================
+       // ============================================
+// ARCHIVE MANAGEMENT - MULTI-CATEGORY SUPPORT
+// ============================================
+
+function loadArchives() {
+    // First, try to load existing archives from localStorage
+    const storedArchives = localStorage.getItem('archives');
+    console.log('Loading archives from storage:', storedArchives); // Debug log
+    
+    let archives;
+    
+    if (storedArchives && storedArchives !== '[]') {
+        // Use existing data if available
+        try {
+            archives = JSON.parse(storedArchives);
+            console.log('Using existing archives:', archives.length);
+        } catch (e) {
+            console.error('Error parsing stored archives:', e);
+            archives = [];
+        }
+    } else {
+        // Only use default data if no data exists
+        console.log('No existing archives found, loading defaults');
+        archives = getDefaultArchives();
         
-        function loadArchives() {
-            const archives = JSON.parse(localStorage.getItem('archives') || '[]');
-            
-            if (archives.length === 0) {
-                // Default archives with multiple categories
-                archives.push(
-                    {
-                        name: 'AnimeFlix',
-                        url: 'animeflix.town',
-                        searchPattern: '/?s={query}',
-                        description: 'Watch anime online in HD quality',
-                        categories: ['anime'],
-                        addedDate: new Date().toISOString()
-                    },
-                    {
-                        name: 'AnimeWorld',
-                        url: 'anime-world.com',
-                        searchPattern: '/search?q={query}',
-                        description: 'Subbed and dubbed anime',
-                        categories: ['anime'],
-                        addedDate: new Date().toISOString()
-                    },
-                    {
-                        name: 'MoviesMod',
-                        url: 'moviesmod.town',
-                        searchPattern: '/?s={query}',
-                        description: 'Movies Mod 2025, MoviesMod Official',
-                        categories: ['movies'],
-                        addedDate: new Date().toISOString()
-                    },
-                    {
-                        name: 'Multimovies',
-                        url: 'multimovies.com',
-                        searchPattern: '/?s={query}',
-                        description: 'Streaming Movies, TV Shows, and Cartoons',
-                        categories: ['movies', 'anime'],
-                        addedDate: new Date().toISOString()
-                    },
-                    {
-                        name: 'SoftArchive',
-                        url: 'softarchive.town',
-                        searchPattern: '/?s={query}',
-                        description: 'Software, games, and ebooks',
-                        categories: ['software', 'games', 'books'],
-                        addedDate: new Date().toISOString()
-                    },
-                    {
-                        name: 'MediaHub',
-                        url: 'mediahub.net',
-                        searchPattern: '/search?q={query}',
-                        description: 'All in one - Movies, Music, Software',
-                        categories: ['movies', 'music', 'software'],
-                        addedDate: new Date().toISOString()
-                    }
-                );
-                localStorage.setItem('archives', JSON.stringify(archives));
-            }
-            
+        // Save defaults to localStorage
+        localStorage.setItem('archives', JSON.stringify(archives));
+        console.log('Saved default archives to storage');
+    }
+    
+    // Migrate old format (single category) to new format (categories array)
+    let updated = false;
+    archives.forEach(archive => {
+        if (archive.category && !archive.categories) {
+            archive.categories = [archive.category];
+            delete archive.category;
+            updated = true;
+        }
+        
+        if (!archive.categories || archive.categories.length === 0) {
+            archive.categories = ['other'];
+            updated = true;
+        }
+        
+        if (!archive.searchPattern) {
+            archive.searchPattern = '/?s={query}';
+            updated = true;
+        }
+    });
+    
+    if (updated) {
+        localStorage.setItem('archives', JSON.stringify(archives));
+        console.log('Updated archive format');
+    }
+
+    return archives;
+}
+
+// Separate function for default archives
+function getDefaultArchives() {
+    return [
+        {
+            name: 'AnimeFlix',
+            url: 'animeflix.town',
+            searchPattern: '/?s={query}',
+            description: 'Watch anime online in HD quality',
+            categories: ['anime'],
+            addedDate: new Date().toISOString()
+        },
+        {
+            name: 'AnimeWorld',
+            url: 'anime-world.com',
+            searchPattern: '/search?q={query}',
+            description: 'Subbed and dubbed anime',
+            categories: ['anime'],
+            addedDate: new Date().toISOString()
+        },
+        {
+            name: 'MoviesMod',
+            url: 'moviesmod.town',
+            searchPattern: '/?s={query}',
+            description: 'Movies Mod 2025, MoviesMod Official',
+            categories: ['movies'],
+            addedDate: new Date().toISOString()
+        },
+        {
+            name: 'Multimovies',
+            url: 'multimovies.com',
+            searchPattern: '/?s={query}',
+            description: 'Streaming Movies, TV Shows, and Cartoons',
+            categories: ['movies', 'anime'],
+            addedDate: new Date().toISOString()
+        },
+        {
+            name: 'SoftArchive',
+            url: 'softarchive.town',
+            searchPattern: '/?s={query}',
+            description: 'Software, games, and ebooks',
+            categories: ['software', 'games', 'books'],
+            addedDate: new Date().toISOString()
+        },
+        {
+            name: 'MediaHub',
+            url: 'mediahub.net',
+            searchPattern: '/search?q={query}',
+            description: 'All in one - Movies, Music, Software',
+            categories: ['movies', 'music', 'software'],
+            addedDate: new Date().toISOString()
+        }
+    ];
+}
             // Migrate old format (single category) to new format (categories array)
             let updated = false;
             archives.forEach(archive => {
@@ -1324,9 +1373,41 @@
         }
 
         // Security: Clear sensitive data on page hide
-        window.addEventListener('pagehide', function() {
-            // Optional: Clear any sensitive data if needed
-        });
+       // Add to both admin.html and index.html (inside script section)
+// Listen for storage changes (when data is modified in another tab)
+window.addEventListener('storage', function(e) {
+    if (e.key === 'archives') {
+        console.log('Archives updated in another tab, refreshing...');
+        if (typeof displayArchives === 'function') {
+            displayArchives();
+        }
+        if (typeof displayCategoryStats === 'function') {
+            displayCategoryStats();
+        }
+        if (typeof displayArchivesList === 'function') {
+            displayArchivesList();
+        }
+        showToast('Data synced from another tab', 'info');
+    }
+});
+// Debug function to check storage
+window.checkStorage = function() {
+    const stored = localStorage.getItem('archives');
+    console.log('Raw storage:', stored);
+    
+    try {
+        const parsed = JSON.parse(stored || '[]');
+        console.log('Parsed archives:', parsed);
+        alert(`Found ${parsed.length} archives in storage`);
+        return parsed;
+    } catch (e) {
+        console.error('Error:', e);
+        alert('Error reading storage');
+    }
+};
+
+// Call it on load
+setTimeout(checkStorage, 1000);
     </script>
 </body>
 </html>
