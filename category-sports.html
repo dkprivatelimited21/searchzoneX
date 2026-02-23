@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free-Link - Live Sports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0a0c10;
+            --bg-secondary: #14181c;
+            --bg-card: #1e2428;
+            --bg-hover: #2a3138;
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --text-muted: #8a8f99;
+            --border-color: #2d343e;
+            --category-sports: #2ecc71;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .category-header {
+            background: linear-gradient(135deg, rgba(46,204,113,0.1), rgba(46,204,113,0.2));
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--category-sports);
+        }
+
+        .category-header::after {
+            content: '⚽';
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 150px;
+            opacity: 0.03;
+            transform: rotate(-15deg);
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .nav-link {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--category-sports);
+            transform: translateY(-2px);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--category-sports);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(46,204,113,0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .stat i {
+            color: var(--category-sports);
+        }
+
+        /* Links Grid */
+        .links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 20px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .link-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 25px;
+            text-decoration: none;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-left-width: 4px;
+            border-left-color: var(--category-sports);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-card::before {
+            content: '⚡';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 40px;
+            opacity: 0.05;
+            transition: all 0.3s ease;
+        }
+
+        .link-card:hover {
+            transform: translateX(5px);
+            background: var(--bg-hover);
+            border-color: var(--category-sports);
+            box-shadow: 0 10px 20px rgba(46,204,113,0.2);
+        }
+
+        .link-card:hover::before {
+            transform: scale(1.2) rotate(10deg);
+            opacity: 0.1;
+        }
+
+        .link-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .link-name i {
+            color: var(--category-sports);
+        }
+
+        .link-url {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+            word-break: break-all;
+            font-family: monospace;
+        }
+
+        .link-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .link-description i {
+            color: var(--category-sports);
+            margin-top: 3px;
+        }
+
+        .sports-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .feature-tag {
+            background: var(--bg-secondary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-tag i {
+            color: var(--category-sports);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .sports-badge {
+            background: var(--category-sports);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .visit-link {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .link-card:hover .visit-link {
+            color: var(--category-sports);
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .quick-stat-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .quick-stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--category-sports);
+            margin: 10px 0;
+        }
+
+        /* Security Notice */
+        .security-notice {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .security-notice i {
+            color: var(--category-sports);
+        }
+
+        @media (max-width: 768px) {
+            .header-title { flex-direction: column; align-items: flex-start; }
+            .links-grid { grid-template-columns: 1fr; }
+            .security-notice { left: 10px; right: 10px; bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="security-notice">
+        <i class="fas fa-shield-alt"></i> 
+        <span>⚽ 18+ Live Sports • HD Streams • Updated Daily</span>
+    </div>
+
+    <div class="container">
+        <div class="nav-bar">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+            <a href="#" class="nav-link" onclick="window.location.reload()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </a>
+        </div>
+
+        <div class="category-header">
+            <div class="header-title">
+                <div class="category-icon">
+                    ⚽
+                </div>
+                <div>
+                    <h1 style="font-size: 2.5rem;">Live Sports Archive</h1>
+                    <p style="color: var(--text-secondary);">Watch live sports streams • NFL • NBA • Soccer • MMA • Boxing</p>
+                    <div class="header-stats">
+                        <div class="stat">
+                            <i class="fas fa-database"></i>
+                            <span id="totalCount">18</span> Sites
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-bolt"></i>
+                            <span>HD/4K</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-clock"></i>
+                            <span>Live 24/7</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="links-header">
+            <h2><i class="fas fa-link" style="color: var(--category-sports);"></i> Available Live Sports Sites</h2>
+            <span class="links-count" id="visibleCount">18 sites total</span>
+        </div>
+
+        <div class="links-grid" id="sportsGrid"></div>
+
+        <div class="quick-stats">
+            <div class="quick-stat-card">
+                <i class="fas fa-futbol fa-2x" style="color: var(--category-sports);"></i>
+                <div class="quick-stat-number">100+</div>
+                <div>Live Events Daily</div>
+            </div>
+            <div class="quick-stat-card">
+                <i class="fas fa-clock fa-2x" style="color: var(--category-sports);"></i>
+                <div class="quick-stat-number">24/7</div>
+                <div>Streaming Uptime</div>
+            </div>
+            <div class="quick-stat-card">
+                <i class="fas fa-globe fa-2x" style="color: var(--category-sports);"></i>
+                <div class="quick-stat-number">18</div>
+                <div>Mirror Sites</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SPORTS_SITES = [
+            { 
+                name: 'LiveTV', 
+                url: 'livetv.sx', 
+                description: 'Comprehensive live sports streaming with multiple events simultaneously. Great for soccer, basketball, and tennis.',
+                features: ['soccer', 'basketball', 'tennis', 'multi-event'],
+                quality: 'HD',
+                sports: ['⚽', '🏀', '🎾']
+            },
+            { 
+                name: 'TotalSportek', 
+                url: 'totalsportek.events', 
+                description: 'One of the most popular sports streaming sites. Covers football, NFL, NBA, UFC and more.',
+                features: ['football', 'nfl', 'nba', 'ufc', 'f1'],
+                quality: 'HD',
+                sports: ['⚽', '🏈', '🏀', '🥊']
+            },
+            { 
+                name: 'SportSurge', 
+                url: 'sportsurge.net', 
+                description: 'Community-driven sports streaming with reliable links. Excellent for NBA and NFL games.',
+                features: ['nba', 'nfl', 'mlb', 'nhl', 'community'],
+                quality: 'HD',
+                sports: ['🏀', '🏈', '⚾', '🏒']
+            },
+            { 
+                name: 'Streamed', 
+                url: 'streamed.pk', 
+                description: 'Fast streaming with minimal ads. Covers major sports leagues and events.',
+                features: ['fast', 'minimal-ads', 'multi-sport'],
+                quality: 'HD',
+                sports: ['⚽', '🏀', '🏈']
+            },
+            { 
+                name: 'TFlix', 
+                url: 'tv.tflix.app', 
+                description: 'Modern streaming platform with clean interface. Great for soccer and basketball.',
+                features: ['clean-ui', 'soccer', 'basketball', 'modern'],
+                quality: '4K',
+                sports: ['⚽', '🏀']
+            },
+            { 
+                name: 'Streameast', 
+                url: 'streameast.ga', 
+                description: 'Popular streaming site known for reliability. Covers NFL, NBA, MMA and more.',
+                features: ['reliable', 'nfl', 'nba', 'ufc', 'boxing'],
+                quality: 'HD',
+                sports: ['🏈', '🏀', '🥊']
+            },
+            { 
+                name: 'FCTv', 
+                url: 'fctv33.hair', 
+                description: 'Dedicated football streaming with multiple leagues. Premier League, La Liga, Champions League.',
+                features: ['football', 'premier-league', 'champions-league', 'live'],
+                quality: 'HD',
+                sports: ['⚽']
+            },
+            { 
+                name: 'MethStreams', 
+                url: 'methstreams.ms', 
+                description: 'Reliable streams for UFC, boxing, and combat sports. Also covers major sports.',
+                features: ['ufc', 'boxing', 'combat-sports', 'mma'],
+                quality: 'HD',
+                sports: ['🥊', '🦵']
+            },
+            { 
+                name: 'SportsBite', 
+                url: 'sportsbite.live', 
+                description: 'All-in-one sports streaming platform. Great for NFL RedZone and NBA League Pass alternatives.',
+                features: ['nfl', 'nba', 'redzone', 'multi-game'],
+                quality: 'HD',
+                sports: ['🏈', '🏀']
+            },
+            { 
+                name: 'Sport71', 
+                url: 'sport71.pro', 
+                description: 'Fast streaming with multiple server options. Covers all major sports.',
+                features: ['multi-server', 'fast', 'reliable'],
+                quality: 'HD',
+                sports: ['⚽', '🏀', '🏈', '⚾']
+            },
+            { 
+                name: 'SportyHunter', 
+                url: 'sportyhunter.com', 
+                description: 'Hunter for the best sports streams. Aggregates links from multiple sources.',
+                features: ['aggregator', 'multi-source', 'best-links'],
+                quality: 'HD',
+                sports: ['⚽', '🏀', '🏈', '🎾']
+            },
+            { 
+                name: 'WatchSports', 
+                url: 'watchsports.to', 
+                description: 'Dedicated sports streaming platform with clean interface. Covers all major leagues.',
+                features: ['clean', 'organized', 'all-sports'],
+                quality: '4K',
+                sports: ['⚽', '🏀', '🏈', '⚾', '🏒']
+            },
+            { 
+                name: 'OnHockey', 
+                url: 'onhockey.tv', 
+                description: 'Specialized in hockey streaming. NHL, KHL, international hockey.',
+                features: ['hockey', 'nhl', 'khl', 'specialized'],
+                quality: 'HD',
+                sports: ['🏒']
+            },
+            { 
+                name: 'CrackStreams', 
+                url: 'crackstreams.io', 
+                description: 'Legendary streaming site for UFC, Boxing, NBA, and NFL. Very reliable.',
+                features: ['ufc', 'boxing', 'nba', 'nfl', 'legendary'],
+                quality: 'HD',
+                sports: ['🥊', '🏀', '🏈']
+            },
+            { 
+                name: 'SportPlus', 
+                url: 'sportplus.live', 
+                description: 'Premium streaming experience with multiple sports. Great for European football.',
+                features: ['premium', 'european', 'football', 'multi-sport'],
+                quality: '4K',
+                sports: ['⚽', '🏀', '🎾']
+            },
+            { 
+                name: 'LiveTV861', 
+                url: 'livetv861.me', 
+                description: 'Alternative LiveTV domain with all the same great features. Multiple events simultaneously.',
+                features: ['multi-event', 'soccer', 'basketball', 'tennis'],
+                quality: 'HD',
+                sports: ['⚽', '🏀', '🎾']
+            },
+            { 
+                name: 'StrikeOut', 
+                url: 'strikeout.im', 
+                description: 'Popular streaming site with extensive sports coverage. Great for MLB and cricket.',
+                features: ['mlb', 'cricket', 'boxing', 'ufc', 'popular'],
+                quality: 'HD',
+                sports: ['⚾', '🏏', '🥊']
+            },
+            { 
+                name: 'WatchFooty', 
+                url: 'watchfooty.st', 
+                description: 'Specialized in football/soccer streaming. All major leagues and tournaments.',
+                features: ['football', 'soccer', 'all-leagues', 'specialized'],
+                quality: 'HD',
+                sports: ['⚽']
+            }
+        ];
+
+        function initialize() {
+            renderSportsGrid();
+            document.getElementById('totalCount').textContent = SPORTS_SITES.length;
+            document.getElementById('visibleCount').textContent = SPORTS_SITES.length + ' sites total';
+            window.scrollTo(0, 0);
+        }
+
+        function renderSportsGrid() {
+            const grid = document.getElementById('sportsGrid');
+            grid.innerHTML = SPORTS_SITES.map((site, index) => `
+                <a href="https://${site.url}" target="_blank" class="link-card" style="animation-delay: ${index * 0.05}s">
+                    <div class="link-name">
+                        <i class="fas fa-trophy"></i>
+                        ${site.name}
+                    </div>
+                    
+                    <div class="link-url">${site.url}</div>
+                    
+                    <div class="link-description">
+                        <i class="fas fa-info-circle"></i>
+                        <span>${site.description}</span>
+                    </div>
+                    
+                    <div class="sports-features">
+                        ${site.features.slice(0, 4).map(f => `
+                            <span class="feature-tag">
+                                <i class="fas fa-tag"></i> ${f}
+                            </span>
+                        `).join('')}
+                        ${site.features.length > 4 ? '<span class="feature-tag">+more</span>' : ''}
+                    </div>
+                    
+                    <div class="card-footer">
+                        <span class="sports-badge">
+                            <i class="fas ${site.quality === '4K' ? 'fa-star' : 'fa-hd'}"></i> 
+                            ${site.quality}
+                        </span>
+                        <span class="visit-link">
+                            Watch Live <i class="fas fa-external-link-alt"></i>
+                        </span>
+                    </div>
+                    
+                    <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">
+                        ${site.sports.join(' ')} Live
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>

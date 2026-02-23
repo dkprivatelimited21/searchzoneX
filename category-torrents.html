@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free-Link - Torrents</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0a0c10;
+            --bg-secondary: #14181c;
+            --bg-card: #1e2428;
+            --bg-hover: #2a3138;
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --text-muted: #8a8f99;
+            --border-color: #2d343e;
+            --category-torrents: #9b59b6;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --warning-color: #f39c12;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .category-header {
+            background: linear-gradient(135deg, rgba(155,89,182,0.1), rgba(155,89,182,0.2));
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--category-torrents);
+        }
+
+        .category-header::after {
+            content: '⚡';
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 150px;
+            opacity: 0.03;
+            transform: rotate(-15deg);
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .nav-link {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--category-torrents);
+            transform: translateY(-2px);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--category-torrents);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(155,89,182,0.3);
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .stat i {
+            color: var(--category-torrents);
+        }
+
+        /* Warning Banner */
+        .warning-banner {
+            background: rgba(243,156,18,0.1);
+            border: 1px solid var(--warning-color);
+            border-radius: 20px;
+            padding: 15px 25px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .warning-banner i {
+            color: var(--warning-color);
+            font-size: 1.5rem;
+        }
+
+        .warning-text {
+            color: var(--warning-color);
+            font-size: 0.9rem;
+        }
+
+        /* Links Grid */
+        .links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 20px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .link-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 25px;
+            text-decoration: none;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-left-width: 4px;
+            border-left-color: var(--category-torrents);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-card::before {
+            content: '⚡';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 40px;
+            opacity: 0.05;
+            transition: all 0.3s ease;
+        }
+
+        .link-card:hover {
+            transform: translateX(5px);
+            background: var(--bg-hover);
+            border-color: var(--category-torrents);
+            box-shadow: 0 10px 20px rgba(155,89,182,0.2);
+        }
+
+        .link-card:hover::before {
+            transform: scale(1.2) rotate(10deg);
+            opacity: 0.1;
+        }
+
+        .link-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .link-name i {
+            color: var(--category-torrents);
+        }
+
+        .link-url {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+            word-break: break-all;
+            font-family: monospace;
+        }
+
+        .link-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .link-description i {
+            color: var(--category-torrents);
+            margin-top: 3px;
+        }
+
+        .torrent-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .feature-tag {
+            background: var(--bg-secondary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-tag i {
+            color: var(--category-torrents);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .torrent-badge {
+            background: var(--category-torrents);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .warning-badge {
+            background: var(--warning-color);
+            color: var(--bg-primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .visit-link {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .link-card:hover .visit-link {
+            color: var(--category-torrents);
+        }
+
+        /* Content Types */
+        .content-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .type-badge {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .type-badge i {
+            color: var(--category-torrents);
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .quick-stat-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .quick-stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--category-torrents);
+            margin: 10px 0;
+        }
+
+        /* Security Notice */
+        .security-notice {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .security-notice i {
+            color: var(--category-torrents);
+        }
+
+        @media (max-width: 768px) {
+            .header-title { flex-direction: column; align-items: flex-start; }
+            .links-grid { grid-template-columns: 1fr; }
+            .security-notice { left: 10px; right: 10px; bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="security-notice">
+        <i class="fas fa-shield-alt"></i> 
+        <span>⚡ Torrent Sites • Use VPN • Verified Links</span>
+    </div>
+
+    <div class="container">
+        <div class="nav-bar">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+            <a href="#" class="nav-link" onclick="window.location.reload()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </a>
+        </div>
+
+        <div class="category-header">
+            <div class="header-title">
+                <div class="category-icon">
+                    ⚡
+                </div>
+                <div>
+                    <h1 style="font-size: 2.5rem;">Torrent Archive</h1>
+                    <p style="color: var(--text-secondary);">Verified torrent sites • Movies • TV • Software • Games • Music</p>
+                    <div class="header-stats">
+                        <div class="stat">
+                            <i class="fas fa-database"></i>
+                            <span id="totalCount">10</span> Sites
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-film"></i>
+                            <span>Movies/TV</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Use VPN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="warning-banner">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div class="warning-text">
+                <strong>⚠️ Important:</strong> Always use a VPN when accessing torrent sites. Check local laws before downloading. Some sites may contain ads or pop-ups.
+            </div>
+        </div>
+
+        <div class="content-types">
+            <span class="type-badge"><i class="fas fa-film"></i> Movies</span>
+            <span class="type-badge"><i class="fas fa-tv"></i> TV Shows</span>
+            <span class="type-badge"><i class="fas fa-music"></i> Music</span>
+            <span class="type-badge"><i class="fas fa-gamepad"></i> Games</span>
+            <span class="type-badge"><i class="fas fa-code"></i> Software</span>
+            <span class="type-badge"><i class="fas fa-book"></i> Books</span>
+        </div>
+
+        <div class="links-header">
+            <h2><i class="fas fa-link" style="color: var(--category-torrents);"></i> Verified Torrent Sites</h2>
+            <span class="links-count" id="visibleCount">10 sites total</span>
+        </div>
+
+        <div class="links-grid" id="torrentGrid"></div>
+
+        <div class="quick-stats">
+            <div class="quick-stat-card">
+                <i class="fas fa-database fa-2x" style="color: var(--category-torrents);"></i>
+                <div class="quick-stat-number">10M+</div>
+                <div>Torrents Available</div>
+            </div>
+            <div class="quick-stat-card">
+                <i class="fas fa-film fa-2x" style="color: var(--category-torrents);"></i>
+                <div class="quick-stat-number">100K+</div>
+                <div>Movies & TV</div>
+            </div>
+            <div class="quick-stat-card">
+                <i class="fas fa-shield-alt fa-2x" style="color: var(--category-torrents);"></i>
+                <div class="quick-stat-number">VPN</div>
+                <div>Recommended</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TORRENT_SITES = [
+            { 
+                name: '1337x', 
+                url: '1337x.to', 
+                description: 'One of the most popular torrent sites with a clean interface. Great for movies, TV shows, games, and software.',
+                features: ['movies', 'tv-shows', 'games', 'software', 'music', 'popular'],
+                content: ['Movies', 'TV', 'Games', 'Software', 'Music'],
+                safety: 'High',
+                language: 'English',
+                verified: true
+            },
+            { 
+                name: 'RuTracker', 
+                url: 'rutracker.org', 
+                description: 'Russian torrent tracker with massive library. Excellent for rare content, music, and software. English interface available.',
+                features: ['russian', 'music', 'software', 'rare-content', 'massive'],
+                content: ['Music', 'Software', 'Movies', 'Books'],
+                safety: 'High',
+                language: 'Russian/English',
+                verified: true
+            },
+            { 
+                name: 'LimeTorrents', 
+                url: 'limetorrents.fun', 
+                description: 'Fast and reliable torrent site with verified torrents. Good for movies and TV shows.',
+                features: ['fast', 'verified', 'movies', 'tv-shows', 'reliable'],
+                content: ['Movies', 'TV', 'Music', 'Games'],
+                safety: 'Medium',
+                language: 'English',
+                verified: true
+            },
+            { 
+                name: 'YTS', 
+                url: 'yts.bz', 
+                description: 'Specialized in high-quality movie torrents with small file sizes. Best for movies in 1080p and 720p.',
+                features: ['movies', 'small-size', 'hd', 'specialized', 'high-quality'],
+                content: ['Movies Only'],
+                safety: 'High',
+                language: 'English',
+                verified: true
+            },
+            { 
+                name: 'EZTV', 
+                url: 'eztvx.to', 
+                description: 'The go-to site for TV show torrents. Updated daily with the latest episodes.',
+                features: ['tv-shows', 'daily-updates', 'episodes', 'specialized'],
+                content: ['TV Shows Only'],
+                safety: 'High',
+                language: 'English',
+                verified: true
+            },
+            { 
+                name: 'TorrentGalaxy', 
+                url: 'torrentgalaxy.one', 
+                description: 'All-around torrent site with a friendly community. Great for movies, TV, and music.',
+                features: ['community', 'movies', 'tv', 'music', 'friendly'],
+                content: ['Movies', 'TV', 'Music', 'Games'],
+                safety: 'Medium',
+                language: 'English',
+                verified: true
+            },
+            { 
+                name: 'ExtraTorrent', 
+                url: 'extratorrent.st', 
+                description: 'Classic torrent site with a huge database. Good alternative to the original ExtraTorrent.',
+                features: ['classic', 'huge-database', 'alternative', 'movies', 'tv'],
+                content: ['Movies', 'TV', 'Music', 'Software'],
+                safety: 'Medium',
+                language: 'English',
+                verified: true
+            },
+            { 
+                name: 'EXT', 
+                url: 'ext.to', 
+                description: 'Clean torrent site with easy navigation. Good for movies and TV shows.',
+                features: ['clean', 'easy-navigation', 'movies', 'tv', 'simple'],
+                content: ['Movies', 'TV', 'Music'],
+                safety: 'Medium',
+                language: 'English',
+                verified: true
+            },
+            { 
+                name: 'RARBG', 
+                url: 'rargb.to', 
+                description: 'Successor to the beloved RARBG. High-quality releases with detailed information.',
+                features: ['high-quality', 'detailed', 'movies', 'tv', 'games', 'premium'],
+                content: ['Movies', 'TV', 'Games', 'Software', 'Music'],
+                safety: 'High',
+                language: 'English',
+                verified: true
+            },
+            { 
+                name: 'The Pirate Bay', 
+                url: 'thepiratebay.org', 
+                description: 'The legendary torrent site. Use with caution and always use a VPN. Massive database of everything.',
+                features: ['legendary', 'massive', 'all-content', 'use-vpn', 'caution'],
+                content: ['Everything'],
+                safety: 'Low - Use VPN',
+                language: 'Multi',
+                verified: true,
+                warning: true
+            }
+        ];
+
+        function initialize() {
+            renderTorrentGrid();
+            document.getElementById('totalCount').textContent = TORRENT_SITES.length;
+            document.getElementById('visibleCount').textContent = TORRENT_SITES.length + ' sites total';
+            window.scrollTo(0, 0);
+        }
+
+        function renderTorrentGrid() {
+            const grid = document.getElementById('torrentGrid');
+            grid.innerHTML = TORRENT_SITES.map((site, index) => `
+                <a href="https://${site.url}" target="_blank" class="link-card" style="animation-delay: ${index * 0.05}s">
+                    <div class="link-name">
+                        <i class="fas fa-bolt"></i>
+                        ${site.name} ${site.warning ? '⚠️' : ''}
+                    </div>
+                    
+                    <div class="link-url">${site.url}</div>
+                    
+                    <div class="link-description">
+                        <i class="fas fa-info-circle"></i>
+                        <span>${site.description}</span>
+                    </div>
+                    
+                    <div class="torrent-features">
+                        ${site.features.slice(0, 4).map(f => `
+                            <span class="feature-tag">
+                                <i class="fas fa-tag"></i> ${f}
+                            </span>
+                        `).join('')}
+                        ${site.features.length > 4 ? '<span class="feature-tag">+more</span>' : ''}
+                    </div>
+                    
+                    <div class="card-footer">
+                        ${site.warning ? 
+                            '<span class="warning-badge"><i class="fas fa-exclamation-triangle"></i> Use VPN</span>' : 
+                            '<span class="torrent-badge"><i class="fas fa-check-circle"></i> Verified</span>'
+                        }
+                        <span class="visit-link">
+                            Visit Site <i class="fas fa-external-link-alt"></i>
+                        </span>
+                    </div>
+                    
+                    <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap;">
+                        <span><i class="fas fa-tag"></i> ${site.content.slice(0, 3).join(' • ')}${site.content.length > 3 ? ' • +more' : ''}</span>
+                        <span><i class="fas fa-globe"></i> ${site.language}</span>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>
